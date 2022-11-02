@@ -9,7 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 
-const sample = ['product', 'link', 'card'];
+const sample = ['a', 'b', 'c'];
 
 type Tile = { type: string };
 
