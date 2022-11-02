@@ -6,6 +6,7 @@ import {
   FlatList,
   ListRenderItem,
   ListRenderItemInfo,
+  SafeAreaView,
 } from 'react-native';
 
 const sample = ['product', 'link', 'card'];
@@ -47,7 +48,11 @@ const List = React.memo(
           data={item}
           renderItem={renderHorizontalListTile}
           horizontal
+          // Below line surfaces issue
           onViewableItemsChanged={console.log}
+          // You will notice that as soon as the list is mounted, every nested list rendered by this component fires it's viewable items changed callback
+          // This is because virtualized list is not taking vertical viewability into account
+          // Technically you should only see the nested callbacks fire once they enter the viewport bidirectionally (vertically and horizontally)
         />
       </View>
     );
@@ -57,14 +62,14 @@ const List = React.memo(
 
 const data = Array.from({ length: listLength() }, () => {
   const type = sample[getRandomInt(2)];
-  return Array.from({ length: Math.max(4, getRandomInt(10)) }, () => ({
+  return Array.from({ length: Math.max(6, getRandomInt(10)) }, () => ({
     type,
   }));
 }) as Tile[][];
 
 export default function App() {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Text style={styles.paragraph}>
         Change code in the editor and watch it change on your phone! Save to get
         a shareable url.
@@ -73,17 +78,16 @@ export default function App() {
         ItemSeparatorComponent={Separator}
         data={data}
         renderItem={renderVerticalList}
-        style={{ flex: 1 }}
+        // Uncomment to see vertical viewability changes of horizontal lists (works as expected)
+        // onViewableItemsChanged={console.log}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: '#ecf0f1',
-    padding: 8,
   },
   paragraph: {
     margin: 24,
